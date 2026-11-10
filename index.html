@@ -48,6 +48,7 @@ h1 small{display:block;font-size:.75rem;font-weight:400;color:var(--muted);lette
 .lead{margin:0;color:var(--muted);font-size:.8125rem;max-width:72ch}
 .main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
 @media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.detail{order:-1;position:static}}
+@media (min-width:861px) and (min-height:760px){.detail{position:sticky;top:12px}}
 .tablebox{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:72vh;min-width:0}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:7px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
@@ -66,7 +67,7 @@ td.sub{color:var(--muted)}
 .row.hit td{background:var(--hit)}
 .group td{border-top:2px solid var(--line)}
 .empty{padding:28px;text-align:center;color:var(--muted);font-family:var(--sans)}
-.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;position:sticky;top:12px}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;}
 .detail .kind{font-size:.75rem;color:var(--muted);letter-spacing:.06em}
 .detail .big{font-family:var(--mono);font-size:1.75rem;font-weight:600;line-height:1.2}
 .detail .alias{font-size:.8125rem;color:var(--muted)}
@@ -83,7 +84,7 @@ footer p{margin:0}
 
 <div class="wrap">
   <header>
-    <h1><small>JIS B 0205 / B 0206 / B 0208 / ウィット（旧JIS） / B 0203 / B 0202</small>JISねじ早見表</h1>
+    <h1><small><span id="ver">2026-11-10 改3</span> ・ JIS B 0205 / B 0206 / B 0208 / ウィット（旧JIS） / B 0203 / B 0202</small>JISねじ早見表</h1>
     <div class="search">
       <label for="q">検索</label>
       <input id="q" type="search" placeholder="例: M8 / M10x1.25 / 1/4-20 / #10 / 15A" autocomplete="off">
