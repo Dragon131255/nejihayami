@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='9,2 23,2 27,8 5,8' fill='%232747c9'/%3E%3Crect x='12' y='8' width='8' height='20' fill='%235b6876'/%3E%3Cg stroke='%23e3e8fb' stroke-width='1.5'%3E%3Cline x1='12' y1='12' x2='20' y2='14'/%3E%3Cline x1='12' y1='16' x2='20' y2='18'/%3E%3Cline x1='12' y1='20' x2='20' y2='22'/%3E%3Cline x1='12' y1='24' x2='20' y2='26'/%3E%3C/g%3E%3Cpolygon points='12,28 20,28 16,31' fill='%235b6876'/%3E%3C/svg%3E">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>JISねじ早見表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* Layout: 工具棚の早見カード。上にタブと検索、左に表、右（スマホは下）に選択したねじの詳細 */
+:root{
+  --bg:#f3f5f7; --surface:#ffffff; --line:#d5dbe2; --fg:#18212b; --muted:#5b6876;
+  --accent:#2747c9; --accent-soft:#e3e8fb; --hit:#fff4c2; --drill:#c2410c; --od:#0f7a4a;
+  --sans:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --surface:#171e26; --line:#2a3440; --fg:#e4e9ef; --muted:#93a1b0;
+  --accent:#8ea4ff; --accent-soft:#1f2a4d; --hit:#3a3417; --drill:#fb923c; --od:#4ade80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --surface:#171e26; --line:#2a3440; --fg:#e4e9ef; --muted:#93a1b0;
+  --accent:#8ea4ff; --accent-soft:#1f2a4d; --hit:#3a3417; --drill:#fb923c; --od:#4ade80; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-size:1.5rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;font-size:.75rem;font-weight:400;color:var(--muted);letter-spacing:.08em}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:0;flex:0 1 320px}
+.search input{border:0;background:transparent;color:var(--fg);font:inherit;font-family:var(--mono);outline:none;width:100%;min-width:0}
+.search:focus-within{border-color:var(--accent)}
+.search label{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--fg);
+  padding:8px 14px;border-radius:999px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab .n{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.tab[aria-selected="true"] .n{color:var(--surface);opacity:.8}
+.tab:focus-visible,.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lead{margin:0;color:var(--muted);font-size:.8125rem;max-width:72ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.detail{order:-1}}
+.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:72vh;min-width:0}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:7px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--surface);font-size:.75rem;font-weight:500;color:var(--muted);z-index:1;box-shadow:0 1px 0 var(--line);vertical-align:bottom;line-height:1.3}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--mono);font-size:.875rem}
+td.name{font-weight:600;color:var(--fg)}
+td.drill{color:var(--drill);font-weight:600}
+td.relief,.kv dd.relief{color:var(--accent);font-weight:600}
+td.od,.kv dd.od{color:var(--od);font-weight:600}
+td.sub{color:var(--muted)}
+.row{cursor:pointer}
+.row:hover td{background:var(--accent-soft)}
+.row.sel td{background:var(--accent-soft)}
+.row.sel td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.row.hit td{background:var(--hit)}
+.group td{border-top:2px solid var(--line)}
+.empty{padding:28px;text-align:center;color:var(--muted);font-family:var(--sans)}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;position:sticky;top:12px}
+.detail .kind{font-size:.75rem;color:var(--muted);letter-spacing:.06em}
+.detail .big{font-family:var(--mono);font-size:1.75rem;font-weight:600;line-height:1.2}
+.detail .alias{font-size:.8125rem;color:var(--muted)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.kv dt{color:var(--muted);font-size:.8125rem}
+.kv dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kv dd.drill{color:var(--drill);font-weight:600;font-size:1.125rem}
+svg{width:100%;max-width:260px;justify-self:center;height:auto}
+.note{font-size:.75rem;color:var(--muted);margin:0;border-top:1px solid var(--line);padding-top:10px}
+footer{font-size:.75rem;color:var(--muted);display:grid;gap:4px;max-width:90ch}
+footer p{margin:0}
+@media (prefers-reduced-motion:no-preference){.row td{transition:background .12s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><small>JIS B 0205 / B 0206 / B 0208 / ウィット（旧JIS） / B 0203 / B 0202</small>JISねじ早見表</h1>
+    <div class="search">
+      <label for="q">検索</label>
+      <input id="q" type="search" placeholder="例: M8 / M10x1.25 / 1/4-20 / #10 / 15A" autocomplete="off">
+    </div>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="lead" id="lead"></p>
+  <div class="main">
+    <div class="tablebox"><table id="tbl"></table></div>
+    <aside class="detail" id="detail" aria-live="polite"></aside>
+  </div>
+  <footer>
+    <p>下穴径は切削タップでひっかかり率おおむね80〜90%を狙う一般的な目安です。材質・タップ種類（転造タップは大きめ）・必要強度で調整してください。</p>
+    <p>メートルねじの下穴径＝外径−ピッチ。有効径 d₂＝d−0.6495P、めねじ内径 D₁＝D−1.0825P（基準寸法）。</p>
+    <p>ユニファイねじも山の角度60°で同じ式（P＝25.4÷山数）。下穴径は外径−ピッチを0.05mm単位に丸めた目安です。</p>
+    <p>ウィットねじは山の角度55°。d₂＝d−0.6403P、d₁＝d−1.2807P。大径（おおむねM50超）は旋盤加工が一般的で、下穴径は参考値です。</p>
+    <p>逃がし径＝外径−引っかかり高さ×2−1mm。引っかかり高さはメートル・ユニファイが H₁＝0.5413P、ウィットが h＝0.6403P。逃がし径は小数点以下切り捨て。計算結果が0以下になる極小径は「—」です。</p>
+    <p>管用ねじの寸法は基準径（テーパねじはゲージ面位置）の値。旧記号：PT＝R/Rc、PS＝Rp、PF＝G。</p>
+  </footer>
+</div>
+
+<script>
+const coarse=[[1,.25],[1.2,.25],[1.4,.3],[1.6,.35],[1.8,.35],[2,.4],[2.2,.45],[2.5,.45],[3,.5],[3.5,.6],[4,.7],[4.5,.75],[5,.8],[6,1],[7,1],[8,1.25],[10,1.5],[12,1.75],[14,2],[16,2],[18,2.5],[20,2.5],[22,2.5],[24,3],[27,3],[30,3.5],[33,3.5],[36,4],[39,4],[42,4.5],[45,4.5],[48,5],[52,5],[56,5.5],[60,5.5],[64,6],[68,6]];
+const fineSrc=[[1,[.2]],[1.2,[.2]],[1.4,[.2]],[1.6,[.2]],[1.8,[.2]],[2,[.25]],[2.2,[.25]],[2.5,[.35]],[3,[.35]],[3.5,[.35]],[4,[.5]],[4.5,[.5]],[5,[.5]],[5.5,[.5]],[6,[.75]],[7,[.75]],[8,[1,.75]],[9,[1,.75]],[10,[1.25,1,.75]],[11,[1,.75]],[12,[1.5,1.25,1]],[14,[1.5,1]],[15,[1.5,1]],[16,[1.5,1]],[17,[1.5,1]],[18,[2,1.5,1]],[20,[2,1.5,1]],[22,[2,1.5,1]],[24,[2,1.5,1]],[25,[2,1.5,1]],[27,[2,1.5,1]],[28,[2,1.5,1]],[30,[3,2,1.5,1]],[32,[2,1.5]],[33,[3,2,1.5]],[35,[1.5]],[36,[3,2,1.5]],[38,[1.5]],[39,[3,2,1.5]],[40,[3,2,1.5]],[42,[4,3,2,1.5]],[45,[4,3,2,1.5]],[48,[4,3,2,1.5]],[50,[3,2,1.5]],[52,[4,3,2,1.5]],[55,[4,3,2,1.5]],[56,[4,3,2,1.5]],[58,[4,3,2,1.5]],[60,[4,3,2,1.5]],[62,[4,3,2,1.5]],[64,[4,3,2,1.5]],[65,[4,3,2,1.5]],[68,[4,3,2,1.5]],[70,[6,4,3,2,1.5]],[72,[6,4,3,2,1.5]],[75,[4,3,2,1.5]],[76,[6,4,3,2,1.5]],[78,[2]],[80,[6,4,3,2,1.5]],[82,[2]],[85,[6,4,3,2]],[90,[6,4,3,2]],[95,[6,4,3,2]],[100,[6,4,3,2]],[105,[6,4,3,2]],[110,[6,4,3,2]],[115,[6,4,3,2]],[120,[6,4,3,2]],[125,[8,6,4,3,2]],[130,[8,6,4,3,2]],[135,[6,4,3,2]],[140,[8,6,4,3,2]],[145,[6,4,3,2]],[150,[8,6,4,3,2]]];
+// [呼び, 山数/25.4mm, 外径d, 有効径d2, 谷径d1, 基準長さa, A呼称, Rc下穴, G下穴]
+const pipe=[
+ ["1/16",28,7.723,7.142,6.561,3.97,"",6.6,6.8],
+ ["1/8",28,9.728,9.147,8.566,3.97,"6A",8.4,8.8],
+ ["1/4",19,13.157,12.301,11.445,6.01,"8A",11.2,11.8],
+ ["3/8",19,16.662,15.806,14.950,6.35,"10A",14.75,15.25],
+ ["1/2",14,20.955,19.793,18.631,8.16,"15A",18.25,19],
+ ["5/8",14,22.911,21.749,20.587,null,"",null,21],
+ ["3/4",14,26.441,25.279,24.117,9.53,"20A",23.75,24.5],
+ ["7/8",14,30.201,29.039,27.877,null,"",null,28.25],
+ ["1",11,33.249,31.770,30.291,10.39,"25A",30,30.75],
+ ["1-1/4",11,41.910,40.431,38.952,12.70,"32A",38.5,39.5],
+ ["1-1/2",11,47.803,46.324,44.845,12.70,"40A",44.5,45.25],
+ ["2",11,59.614,58.135,56.656,15.88,"50A",56,57],
+ ["2-1/2",11,75.184,73.705,72.226,17.46,"65A",null,null],
+ ["3",11,87.884,86.405,84.926,20.64,"80A",null,null],
+ ["3-1/2",11,100.330,98.851,97.372,22.23,"90A",null,null],
+ ["4",11,113.030,111.551,110.072,25.40,"100A",null,null],
+ ["5",11,138.430,136.951,135.472,28.58,"125A",null,null],
+ ["6",11,163.830,162.351,160.872,28.58,"150A",null,null]];
+
+const uncSrc=[["1",64],["2",56],["3",48],["4",40],["5",40],["6",32],["8",32],["10",24],["12",24],["1/4",20],["5/16",18],["3/8",16],["7/16",14],["1/2",13],["9/16",12],["5/8",11],["3/4",10],["7/8",9],["1\"",8],["1-1/8",7],["1-1/4",7],["1-3/8",6],["1-1/2",6],["1-3/4",5],["2\"",4.5],["2-1/4",4.5],["2-1/2",4],["2-3/4",4],["3\"",4],["3-1/4",4],["3-1/2",4],["3-3/4",4],["4\"",4]];
+const unfSrc=[["0",80],["1",72],["2",64],["3",56],["4",48],["5",44],["6",40],["8",36],["10",32],["12",28],["1/4",28],["5/16",24],["3/8",24],["7/16",20],["1/2",20],["9/16",18],["5/8",18],["3/4",16],["7/8",14],["1\"",12],["1-1/8",12],["1-1/4",12],["1-3/8",12],["1-1/2",12]];
+// 番手（No.）は 0.060+0.013N インチ、分数・整数インチ（"付き）はそのまま
+function inch(s){if(s.endsWith('"'))return +s.slice(0,-1);if(!s.includes("/"))return .06+.013*s;
+  const m=s.match(/^(?:(\d+)-)?(\d+)\/(\d+)$/);return (+(m[1]||0))+m[2]/m[3];}
+function uni(s,tpi,ser){
+  const din=inch(s),d=din*25.4,p=25.4/tpi,num=!s.includes("/")&&!s.endsWith('"');
+  const sz=num?`No.${s}`:s.replace('"',""),bare=sz.replace("No.","");
+  const t=String(tpi),sl=ser.toLowerCase();
+  const keys=[`${bare}-${t}`,`${sz.toLowerCase()}-${t}`,`${bare}${sl}`,`${sl}${bare}`,`${bare}-${t}${sl}`];
+  if(num)keys.push(`#${bare}`,`no${bare}`,`no.${bare}`,`#${bare}-${t}`);else keys.push(bare,`${bare}"`);
+  return {kind:ser==="UNC"?"ユニファイ並目ねじ":"ユニファイ細目ねじ",uni:true,name:`${sz}-${t} ${ser}`,din,d,p,tpi,
+    d2:d-.649519*p,D1:d-1.082532*p,h1:.541266*p,relief:d-2*.541266*p-1,drill:Math.round((d-p)*20)/20,angle:60,keys};
+}
+const whitSrc=[["1/8",40],["3/16",24],["1/4",20],["5/16",18],["3/8",16],["7/16",14],["1/2",12],["9/16",12],["5/8",11],["11/16",11],["3/4",10],["7/8",9],["1\"",8],["1-1/8",7],["1-1/4",7],["1-3/8",6],["1-1/2",6],["1-5/8",5],["1-3/4",5],["1-7/8",4.5],["2\"",4.5],["2-1/4",4],["2-1/2",4],["2-3/4",3.5],["3\"",3.5],["3-1/4",3.25],["3-1/2",3.25],["3-3/4",3],["4\"",3],["4-1/2",2.875],["5\"",2.75],["5-1/2",2.625]];
+function whit(s,tpi){
+  const din=inch(s),d=din*25.4,p=25.4/tpi,sz=s.replace('"',""),t=String(tpi);
+  return {kind:"ウィット並目ねじ",uni:true,whit:true,name:`W${sz}-${t}`,din,d,p,tpi,
+    d2:d-.640327*p,D1:d-1.280654*p,h1:.640327*p,relief:d-2*.640327*p-1,drill:Math.round((d-p)*20)/20,angle:55,
+    keys:[`w${sz}`,`w${sz}-${t}`,`${sz}-${t}`,`bsw${sz}`,sz,`${sz}"`]};
+}
+const r=(x,n)=>Math.round(x*10**n)/10**n;
+const f=(x,n=3)=>x==null?"—":r(x,n).toFixed(n);
+const fd=x=>x==null?"—":String(r(x,2));
+const fp=x=>String(r(x,4));
+
+function metric(d,p,fine){
+  return {kind:fine?"メートル細目ねじ":"メートル並目ねじ",name:fine?`M${d}×${p}`:`M${d}`,d,p,
+    d2:d-.649519*p,D1:d-1.082532*p,h1:.541266*p,relief:d-2*.541266*p-1,drill:r(d-p,2),angle:60,
+    keys:fine?[`m${d}x${p}`,`${d}x${p}`]:[`m${d}`,`${d}`,`m${d}x${p}`],num:d};
+}
+const sets={
+  coarse:{label:"メートル並目",rows:coarse.filter(([d])=>d>=3).map(([d,p])=>metric(d,p,false)),
+    lead:"一般的なボルト・ナットのねじ。呼びは「M＋外径」。ピッチは外径ごとに1つに決まっています。",
+    cols:[["呼び","name"],["外径 d","d",v=>f(v,2).replace(/\.?0+$/,"")],["ピッチ P","p",fp],["下穴径","drill",fd],["有効径 d₂","d2",f],["めねじ内径 D₁","D1",f]]},
+  fine:{label:"メートル細目",rows:fineSrc.filter(([d])=>d>=3).flatMap(([d,ps])=>ps.map(p=>metric(d,p,true))),
+    lead:"並目より細かいピッチ。緩みにくく、薄肉部品や微調整に使います。表記は「M外径×ピッチ」。",
+    cols:[["呼び","name"],["外径 d","d",v=>f(v,2).replace(/\.?0+$/,"")],["ピッチ P","p",fp],["下穴径","drill",fd],["有効径 d₂","d2",f],["めねじ内径 D₁","D1",f]]},
+  unc:{label:"ユニファイ並目 UNC",rows:uncSrc.map(([s,t])=>uni(s,t,"UNC")).filter(x=>x.d>=3),
+    lead:"インチ系の並目ねじ（JIS B 0206）。表記は「外径-山数 UNC」で、#10以下の小径は番手（No.）で呼びます。",cols:uniCols()},
+  unf:{label:"ユニファイ細目 UNF",rows:unfSrc.map(([s,t])=>uni(s,t,"UNF")).filter(x=>x.d>=3),
+    lead:"インチ系の細目ねじ（JIS B 0208）。航空機・自動車・計器などで使われます。",cols:uniCols()},
+  whit:{label:"ウィット W",rows:whitSrc.map(([s,t])=>whit(s,t)),
+    lead:"インチ系・山の角度55°のねじ。JISでは1968年に廃止されましたが、古い機械や建築金物で今も見かけます。",
+    cols:uniCols().map(c=>c[1]==="D1"?["谷径 d₁","D1",f]:c)},
+  taper:{label:"管用テーパ R / Rc",rows:pipe.filter(x=>x[5]!=null).map(x=>pipeRow(x,true)),
+    lead:"配管の気密用。テーパ1/16で締めるほど密着します。R＝テーパおねじ、Rc＝テーパめねじ、Rp＝平行めねじ（Rと組み合わせ）。",
+    cols:[["呼び","name"],["A呼称","A"],["山数<br>/25.4mm","tpi"],["ピッチ P","p",v=>f(v,4)],["下穴径<br>(Rc)","drill",fd],["外径 d<br>(基準径)","d",f],["有効径 d₂","d2",f],["谷径 d₁","d1",f],["基準長さ a","a",v=>f(v,2)]]},
+  parallel:{label:"管用平行 G",rows:pipe.map(x=>pipeRow(x,false)),
+    lead:"機械的な結合用の平行ねじ。ねじ部では気密を取らず、Oリングやガスケットでシールします。",
+    cols:[["呼び","name"],["A呼称","A"],["山数<br>/25.4mm","tpi"],["ピッチ P","p",v=>f(v,4)],["下穴径","drill",fd],["外径 d","d",f],["有効径 d₂","d2",f],["谷径 d₁","d1",f]]}
+};
+function uniCols(){return [["呼び","name"],["外径<br>(inch)","din",v=>f(v,4)],["外径 d<br>(mm)","d",f],["山数<br>/inch","tpi"],["ピッチ P","p",v=>f(v,4)],["下穴径","drill",fd],["有効径 d₂","d2",f],["めねじ内径 D₁","D1",f]]}
+const frl=v=>v>0?String(Math.floor(v)):"—";
+["coarse","fine","unc","unf","whit"].forEach(k=>{const c=sets[k].cols;c.splice(c.findIndex(x=>x[1]==="drill")+1,0,["逃がし径<br>(d−2H₁−1)","relief",frl])});
+function pipeRow([s,tpi,d,d2,d1,a,A,dr,dg],taper){
+  const pre=taper?"R":"G";
+  return {kind:taper?"管用テーパねじ":"管用平行ねじ",name:taper?`R ${s}`:`G ${s}`,size:s,tpi,p:25.4/tpi,d,d2,d1,a,A:A||"—",
+    drill:taper?dr:dg,angle:55,taper,
+    keys:[s,`${pre.toLowerCase()}${s}`,...(taper?[`rc${s}`,`rp${s}`,`pt${s}`,`ps${s}`]:[`pf${s}`]),...(A?[A.toLowerCase()]:[])]};
+}
+
+let cur="coarse",sel=null,query="";
+const $=id=>document.getElementById(id);
+const norm=s=>s.normalize("NFKC").toLowerCase().replace(/[\s　]/g,"").replace(/[×*]/g,"x");
+
+function matches(row,q){
+  if(!q)return false;
+  // 数字だけなら外径mmの整数部で一致（75 → 75.184 も対象）、小数入りなら前方一致
+  if(/^\d+$/.test(q)&&Math.floor(row.d+1e-9)===+q)return true;
+  if(/^\d+\.\d*$/.test(q)&&row.d.toFixed(3).startsWith(q))return true;
+  return row.keys.some(k=>k===q);
+}
+function loose(row,q){return q&&row.keys.some(k=>k.startsWith(q))}
+
+function hitInfo(key){
+  const q=norm(query);if(!q)return {rows:[],exact:false};
+  const rows=sets[key].rows;
+  let hits=rows.filter(x=>matches(x,q));
+  if(hits.length)return {rows:hits,exact:true};
+  return {rows:rows.filter(x=>loose(x,q)),exact:false};
+}
+
+function renderTabs(){
+  $("tabs").innerHTML=Object.entries(sets).map(([k,s])=>{
+    const h=hitInfo(k).rows.length;
+    const n=query?`${h}件`:`${s.rows.length}`;
+    return `<button class="tab" role="tab" id="tab-${k}" aria-selected="${k===cur}" data-k="${k}">${s.label}<span class="n">${n}</span></button>`;
+  }).join("");
+}
+
+function renderTable(){
+  const s=sets[cur];$("lead").textContent=s.lead;
+  const {rows:hits}=hitInfo(cur);
+  const show=query&&hits.length?hits:s.rows;
+  let html="<thead><tr>"+s.cols.map(c=>`<th>${c[0]}</th>`).join("")+"</tr></thead><tbody>";
+  if(query&&!hits.length)html+=`<tr><td colspan="${s.cols.length}" class="empty">「${esc(query)}」に一致するねじはこの表にありません。他のタブの件数を確認してください。</td></tr>`;
+  let prev=null;
+  show.forEach(row=>{
+    const i=s.rows.indexOf(row);
+    const grp=cur==="fine"&&prev!==null&&prev!==row.d?" group":"";prev=row.d;
+    const cls=["row",row===sel?"sel":"",query&&hits.includes(row)&&show!==hits?"hit":""].join(" ")+grp;
+    html+=`<tr class="${cls}" tabindex="0" data-i="${i}">`+s.cols.map(([_,k,fn])=>{
+      const v=row[k];const t=fn?fn(v):(v??"—");
+      const c=k==="name"?"name":k==="drill"?"drill":k==="relief"?"relief":(k==="d"||k==="din")?"od":(k==="d2"||k==="D1"||k==="d1"||k==="a")?"sub":"";
+      return `<td class="${c}">${t}</td>`}).join("")+"</tr>";
+  });
+  $("tbl").innerHTML=html+"</tbody>";
+  const el=$("tbl").querySelector(".row.sel");
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function ring(outer,inner,mid){
+  const R=86,ri=inner?R*inner/outer:null,rm=R*mid/outer;
+  return `<svg viewBox="0 0 220 210" role="img" aria-label="断面の目安：外径と下穴径">
+  <circle cx="110" cy="100" r="${R}" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+  <circle cx="110" cy="100" r="${rm}" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>
+  ${ri?`<circle cx="110" cy="100" r="${ri}" fill="var(--surface)" stroke="var(--drill)" stroke-width="2"/>`:""}
+  <line x1="24" y1="196" x2="196" y2="196" stroke="var(--accent)" stroke-width="1"/>
+  <line x1="24" y1="190" x2="24" y2="202" stroke="var(--accent)"/><line x1="196" y1="190" x2="196" y2="202" stroke="var(--accent)"/>
+  ${ri?`<line x1="${110-ri}" y1="100" x2="${110+ri}" y2="100" stroke="var(--drill)" stroke-width="1.5"/>
+  <text x="110" y="94" text-anchor="middle" font-size="12" font-family="var(--mono)" fill="var(--drill)">φ${fd(inner)}</text>`:""}
+  <text x="110" y="${100-R+16}" text-anchor="middle" font-size="10" fill="var(--muted)">山の頂（外径）</text>
+  </svg>`;
+}
+
+function renderDetail(){
+  const x=sel;if(!x){$("detail").innerHTML="";return}
+  let kv=[],alias="",note="";
+  if(x.uni){
+    alias=x.whit?"インチ系・山の角度55°（ユニファイとは互換なし）　BSWと同等":"インチ系・山の角度60°（メートルねじとは互換なし）";
+    kv=[["外径",f(x.din,4)+" in"],["外径 d",f(x.d)+" mm"],["山数",x.tpi+" 山/inch"],["ピッチ P",f(x.p,4)+" mm"],["有効径 d₂",f(x.d2)+" mm"],[x.whit?"谷径 d₁":"めねじ内径 D₁",f(x.D1)+" mm"],["引っかかり高さ "+(x.whit?"h":"H₁"),f(x.h1)+" mm"],["逃がし径",frl(x.relief)+(x.relief>0?" mm":""),"relief"],["山の角度",x.angle+"°"],["下穴径（目安）",fd(x.drill)+" mm","drill"]];
+    note=`下穴径 ≒ ${f(x.d)} − ${f(x.p,3)} ≒ ${fd(x.drill)} mm`;
+  }else if(x.angle===60){
+    alias=x.kind==="メートル並目ねじ"?`M${x.d}×${fp(x.p)} と同じ（並目はピッチ省略）`:"細目はピッチを必ず表記";
+    kv=[["外径 d",f(x.d,2)+" mm"],["ピッチ P",fp(x.p)+" mm"],["有効径 d₂",f(x.d2)+" mm"],["めねじ内径 D₁",f(x.D1)+" mm"],["引っかかり高さ H₁",f(x.h1)+" mm"],["逃がし径",frl(x.relief)+(x.relief>0?" mm":""),"relief"],["山の角度","60°"],["下穴径（目安）",fd(x.drill)+" mm","drill"]];
+    note=`下穴径 = ${x.d} − ${fp(x.p)} = ${fd(x.drill)} mm`;
+  }else{
+    alias=x.taper?`めねじ Rc ${x.size}／平行めねじ Rp ${x.size}　旧 PT ${x.size}`:`旧 PF ${x.size}`;
+    kv=[["A呼称",x.A],["山数",x.tpi+" 山/25.4mm"],["ピッチ P",f(x.p,4)+" mm"],["外径 d"+(x.taper?"（基準径）":""),f(x.d)+" mm"],["有効径 d₂",f(x.d2)+" mm"],["谷径 d₁",f(x.d1)+" mm"]];
+    if(x.taper)kv.push(["基準長さ a",f(x.a,2)+" mm"],["テーパ","1/16"]);
+    kv.push(["山の角度","55°"],["下穴径（目安）",x.drill==null?"—":fd(x.drill)+" mm","drill"]);
+    note=x.drill==null?"この大きさは旋盤でのねじ切りが一般的なため、タップ下穴径は載せていません。"
+      :x.taper?"Rcの下穴はテーパリーマを使わない場合の目安。テーパリーマ仕上げならやや小さめで可。":"Gは平行ねじなので、シールはOリング・ガスケット側で取ります。";
+  }
+  $("detail").innerHTML=`<div><div class="kind">${x.kind}</div><div class="big">${x.name}</div><div class="alias">${alias}</div></div>
+  ${ring(x.d,x.drill,x.d2)}
+  <dl class="kv">${kv.map(([k,v,c])=>`<dt>${k}</dt><dd class="${c||(k.startsWith("外径")?"od":"")}">${v}</dd>`).join("")}</dl>
+  <p class="note">${note}<br>図：外側の円＝外径、点線＝有効径、オレンジ＝下穴径（縮尺は外径基準）。</p>`;
+}
+
+function renderAll(){renderTabs();renderTable();renderDetail()}
+
+$("tabs").addEventListener("click",e=>{const b=e.target.closest(".tab");if(!b)return;
+  cur=b.dataset.k;const h=hitInfo(cur).rows;sel=h[0]||sets[cur].rows[Math.min(8,sets[cur].rows.length-1)];renderAll()});
+$("tbl").addEventListener("click",e=>{const tr=e.target.closest(".row");if(!tr)return;sel=sets[cur].rows[+tr.dataset.i];renderTable();renderDetail()});
+$("tbl").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const tr=e.target.closest(".row");if(tr){e.preventDefault();sel=sets[cur].rows[+tr.dataset.i];renderTable();renderDetail();$("tbl").querySelector(`[data-i="${tr.dataset.i}"]`)?.focus()}}});
+$("q").addEventListener("input",e=>{
+  query=e.target.value.trim();
+  if(query){
+    const order=[cur,...Object.keys(sets).filter(k=>k!==cur)];
+    const ex=order.find(k=>hitInfo(k).exact)||order.find(k=>hitInfo(k).rows.length);
+    if(ex){cur=ex;sel=hitInfo(ex).rows[0]}
+  }
+  renderAll();
+});
+sel=sets.coarse.rows.find(x=>x.d===8);
+renderAll();
+</script>
+
+</body>
+</html>
